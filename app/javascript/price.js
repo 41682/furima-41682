@@ -1,6 +1,6 @@
 function price (){
   const itemPrice  = document.getElementById("item-price");
-  itemPrice.addEventListener("keyup", () => {
+  itemPrice.addEventListener("input", () => {
     // 入力された価格を取得
     const priceInput = itemPrice.value;
     // 数値以外の文字が含まれていないかチェック
@@ -37,3 +37,4 @@ function price (){
 };
 
 window.addEventListener('turbo:load', price);
+document.addEventListener('turbo:render', price);
