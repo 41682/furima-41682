@@ -2,7 +2,9 @@ require 'rails_helper'
 
 RSpec.describe OrderShippingAddress, type: :model do
   before do
-    @order_shipping_address = FactoryBot.build(:order_shipping_address)
+    user = FactoryBot.create(:user)
+    item = FactoryBot.create(:item, user: user)
+    @order_shipping_address = FactoryBot.build(:order_shipping_address, user_id: user.id, item_id: item.id)
   end
 
   describe '商品購入機能' do
@@ -13,24 +15,11 @@ RSpec.describe OrderShippingAddress, type: :model do
 
       it 'buildingが空でも登録できる' do
         @order_shipping_address.building = ''
-        @order_shipping_address.valid?
         expect(@order_shipping_address).to be_valid
       end
     end
 
     context '商品購入できない場合' do
-      it 'user_idが空では登録できない' do
-        @order_shipping_address.user_id = nil
-        @order_shipping_address.valid?
-        expect(@order_shipping_address.errors.full_messages).to include("User can't be blank")
-      end
-  
-      it 'item_idが空では登録できない' do
-        @order_shipping_address.item_id = nil
-        @order_shipping_address.valid?
-        expect(@order_shipping_address.errors.full_messages).to include("Item can't be blank")
-      end
-  
       it 'tokenが空では登録できない' do
         @order_shipping_address.token = nil
         @order_shipping_address.valid?
@@ -38,7 +27,7 @@ RSpec.describe OrderShippingAddress, type: :model do
       end
   
       it '郵便番号が空では登録できない' do
-        @order_shipping_address.postal_code = nil
+        @order_shipping_address.postal_code = ''
         @order_shipping_address.valid?
         expect(@order_shipping_address.errors.full_messages).to include("Postal code can't be blank")
       end
@@ -77,6 +66,30 @@ RSpec.describe OrderShippingAddress, type: :model do
         @order_shipping_address.phone_number = '123-4567-8901'
         @order_shipping_address.valid?
         expect(@order_shipping_address.errors.full_messages).to include("Phone number is invalid")
+      end
+
+      it '9桁以下の電話番号では登録できない' do
+        @order_shipping_address.phone_number = '123456789'
+        @order_shipping_address.valid?
+        expect(@order_shipping_address.errors.full_messages).to include("Phone number is invalid")
+      end
+
+      it '12桁以上の電話番号では登録できない' do
+        @order_shipping_address.phone_number = '123456789012'
+        @order_shipping_address.valid?
+        expect(@order_shipping_address.errors.full_messages).to include("Phone number is invalid")
+      end
+
+      it 'userが紐付いていないと保存できないこと' do
+        @order_shipping_address.user_id = nil
+        @order_shipping_address.valid?
+        expect(@order_shipping_address.errors.full_messages).to include("User can't be blank")
+      end
+
+      it 'itemが紐付いていないと保存できないこと' do
+        @order_shipping_address.item_id = nil
+        @order_shipping_address.valid?
+        expect(@order_shipping_address.errors.full_messages).to include("Item can't be blank")
       end
     end
   end
