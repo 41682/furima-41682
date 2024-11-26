@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe OrderShippingAddress, type: :model do
   before do
-    user = FactoryBot.create(:user)
-    item = FactoryBot.create(:item, user: user)
+    user = FactoryBot.build_stubbed(:user)
+    item = FactoryBot.build_stubbed(:item, user: user)
     @order_shipping_address = FactoryBot.build(:order_shipping_address, user_id: user.id, item_id: item.id)
   end
 
